@@ -1,0 +1,106 @@
+public class ArvoreBinaria {
+
+    private No raiz = null;
+    private int tamanho = 0;
+
+    private No adicionaAuxiliar(No raiz, int numero) {
+        if (raiz == null) {
+            raiz = new No(numero);
+            this.tamanho++;
+        } else if (raiz.getNumero() > numero) {
+            raiz.setLinke(adicionaAuxiliar(raiz.getLinke(), numero));
+        } else if (raiz.getNumero() < numero) {
+            raiz.setLinkd(adicionaAuxiliar(raiz.getLinkd(), numero));
+        } else {
+            System.out.println("Número já existe");
+        }
+        return raiz;
+    }
+
+    public void adiciona(int numero) {
+        raiz = this.adicionaAuxiliar(raiz, numero);
+    }
+
+    private No excluiAuxiliar(No raiz, int numero) {
+        if (raiz != null) {
+            if(raiz.getNumero() > numero) {
+                raiz.setLinke(excluiAuxiliar(raiz.getLinke(), numero));
+            } else if (raiz.getNumero() < numero) {
+                raiz.setLinkd(excluiAuxiliar(raiz.getLinkd(), numero));
+            } else if (raiz.getLinkd() == null && raiz.getLinke() == null) {
+                this.tamanho--;
+                return null;
+            } else if (raiz.getLinkd() != null ^ raiz.getLinke() != null) {
+                raiz = (raiz.getLinkd() == null) ? raiz.getLinke() : raiz.getLinkd();
+                this.tamanho--;
+                return raiz;
+            } else {
+                No aux = raiz.getLinke();
+
+                while(aux.getLinkd() != null) aux = aux.getLinkd();
+
+                raiz.setNumero(aux.getNumero());
+                raiz.setLinke(excluiAuxiliar(raiz.getLinke(), numero));
+
+                return raiz;
+            }
+        }
+        return raiz;
+    }
+
+    public void exclui(int numero) {
+        raiz = this.excluiAuxiliar(raiz, numero);
+    }
+
+    private int alturaAuxiliar(No raiz) {
+        if (raiz != null) {
+            int altE = this.alturaAuxiliar(raiz.getLinke());
+            int altD = this.alturaAuxiliar(raiz.getLinkd());
+            return (altE > altD) ? altE + 1 : altD + 1;
+        }
+        return 0;
+    }
+
+    public int altura() {
+        return alturaAuxiliar(raiz);
+    }
+
+    private boolean buscaAuxiliar(No raiz, int numero) {
+        if (raiz != null) {
+            boolean igual = raiz.getNumero() == numero;
+            if (!igual) {
+                No testeRaiz = (raiz.getNumero() < numero) ? raiz.getLinkd() : raiz.getLinke();
+                igual = this.buscaAuxiliar(testeRaiz, numero);
+            }
+            return igual;
+        }
+        return false;
+    }
+
+    public boolean busca(int numero) {
+        return this.buscaAuxiliar(raiz, numero);
+    }
+
+    public int tamanho() {
+        return this.tamanho;
+    }
+
+    public void emOrdemAuxiliar(No raiz, StringBuilder builder) {
+        if (raiz != null) {
+            this.emOrdemAuxiliar(raiz.getLinke(), builder);
+            builder.append(raiz.getNumero());
+            builder.append(", ");
+            this.emOrdemAuxiliar(raiz.getLinkd(), builder);
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("[");
+        this.emOrdemAuxiliar(raiz, builder);
+        builder.delete(builder.length()-2, builder.length());
+        builder.append("]");
+        return builder.toString();
+    }
+
+}
